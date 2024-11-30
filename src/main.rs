@@ -18,9 +18,9 @@ pub mod utils;
 async fn main() {
     let mods = api::fetch_all_mods().await.unwrap();
 
-    for m in mods.iter() {
+    for m in &mods {
         let _ = api::download_and_verify_mod_with_info(m, "F:\\New folder").await;
-        println!("{} {}", m.name, m.id)
+        println!("{} {}", m.name, m.id);
     }
 
     /*let _ = api::download_and_verify_mod(

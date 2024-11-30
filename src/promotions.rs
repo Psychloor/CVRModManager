@@ -7,6 +7,7 @@ pub struct Promotion {
 }
 
 impl Promotion {
+    #[must_use]
     pub fn new(mod_name: String, description: String, link: String) -> Self {
         Self {
             mod_name,
@@ -24,13 +25,13 @@ pub struct Promotions {
 
 impl Promotions {
     fn new() -> Self {
-        let mut promotions = Vec::new();
-
-        promotions.push(Promotion::new(
-            "ChilloutVR Modding Group".to_string(),
-            "Join our Discord!".to_string(),
-            "https://discord.gg/dndGPM3bxu".to_string(),
-        ));
+        let promotions = vec![
+            Promotion::new(
+                "ChilloutVR Modding Group".to_string(),
+                "Join our Discord!".to_string(),
+                "https://discord.gg/dndGPM3bxu".to_string(),
+            )
+        ];
 
         Self { promotions }
     }

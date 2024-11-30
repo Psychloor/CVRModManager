@@ -21,7 +21,7 @@ pub static AUTHORS: LazyLock<HashMap<String, String>> = LazyLock::new(|| {
 
 pub fn get_author_name(discord_id: &str) -> Option<&str> {
     if let Some(name) = AUTHORS.get(discord_id) {
-        return Some(name);
+        Some(name)
     } else {
         None
     }

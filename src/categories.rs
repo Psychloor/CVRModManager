@@ -65,7 +65,7 @@ pub static CATEGORY_DESCRIPTION: LazyLock<HashMap<String, String>> = LazyLock::n
 
 pub fn get_category_description(category: &str) -> Option<&str> {
     if let Some(description) = CATEGORY_DESCRIPTION.get(category) {
-        return Some(description);
+        Some(description)
     } else {
         None
     }

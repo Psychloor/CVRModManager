@@ -23,12 +23,10 @@ pub(crate) async fn get_all_files_in_directory(
 
     while let Some(entry) = entries.next_entry().await? {
         if entry.file_type().await?.is_file() {
-            if !filter.is_empty() {
-                if entry.file_name().to_string_lossy().contains(filter) {
-                    files.push(entry.file_name().to_string_lossy().to_string());
-                }
-            } else {
-                files.push(entry.file_name().to_string_lossy().to_string());
+            let file_name = entry.file_name().to_string_lossy().to_string();
+
+            if filter.is_empty() || file_name.contains(filter) {
+                files.push(file_name);
             }
         }
     }
@@ -54,6 +52,11 @@ pub fn is_melon_loader_installed() -> bool {
     version_dll && bootstrap_dll
 }
 
+/// Removes the `MelonLoader` files and directories.
+///
+/// # Errors
+///
+/// This function will return an error if it fails to remove any of the files or directories.
 pub fn remove_melon_loader() -> Result<(), String> {
     let chillout_folder_path = Path::new(config::CONFIGURATION_INSTANCE.chillout_folder());
 
@@ -76,25 +79,4 @@ pub fn remove_melon_loader() -> Result<(), String> {
     }
 
     Ok(())
-}
-
-#[repr(u8)]
-pub enum SizeUnit {
-    Bytes = 0,
-    KiloBytes = 1,
-    MegaBytes = 2,
-    GigaBytes = 3,
-    TeraBytes = 4,
-    PetaBytes = 5,
-}
-
-struct ConvertedSize {
-    original: u64,
-    converted: f64,
-    unity: SizeUnit,
-}
-
-pub fn convert_size_unit(bytes_size: u64, target: SizeUnit) -> f64 {
-    let division = 1024_u64.pow(target as u32);
-    bytes_size as f64 / division as f64
 }

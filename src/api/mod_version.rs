@@ -1,20 +1,16 @@
+use semver::Version;
 use serde::de::{self};
 use serde::{Deserialize, Deserializer};
 use std::str::FromStr;
 
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone, Default)]
 pub(crate) enum ApprovalStatus {
+    #[default]
     AwaitingApproval,
     Approved,
     /// Retired too
     Outdated(Option<String>),
     Broken(Option<String>),
-}
-
-impl Default for ApprovalStatus {
-    fn default() -> Self {
-        ApprovalStatus::AwaitingApproval
-    }
 }
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone, Deserialize)]
@@ -36,7 +32,8 @@ pub(crate) struct ModVersion {
     pub approval_status: ApprovalStatus,
     pub name: String,
     #[serde(deserialize_with = "parse_semver")]
-    pub mod_version: semver::Version,
+    #[allow(clippy::struct_field_names)]
+    pub mod_version: Version,
     pub game_version: String,
     pub loader_version: String,
     #[serde(deserialize_with = "deserialize_mod_type")]
@@ -53,18 +50,17 @@ pub(crate) struct ModVersion {
 }
 
 impl ModVersion {
-    #[allow(dead_code)]
     pub(crate) fn color_as_f32(&self) -> Result<[f32; 3], std::num::ParseIntError> {
         let hex = self.embed_color.trim_start_matches('#');
         Ok([
-            u8::from_str_radix(&hex[0..2], 16)? as f32 / 255.0,
-            u8::from_str_radix(&hex[2..4], 16)? as f32 / 255.0,
-            u8::from_str_radix(&hex[4..6], 16)? as f32 / 255.0,
+            f32::from(u8::from_str_radix(&hex[0..2], 16)?) / 255.0,
+            f32::from(u8::from_str_radix(&hex[2..4], 16)?) / 255.0,
+            f32::from(u8::from_str_radix(&hex[4..6], 16)?) / 255.0,
         ])
     }
 
     // Converts color hex to [u8; 3]
-    #[allow(dead_code)]
+
     pub(crate) fn color_as_u8(&self) -> Result<[u8; 3], std::num::ParseIntError> {
         let hex = self.embed_color.trim_start_matches('#');
         Ok([
@@ -74,12 +70,10 @@ impl ModVersion {
         ])
     }
 
-    #[allow(dead_code)]
     pub(crate) fn get_authors_joined(&self, separator: &str) -> String {
         self.authors.join(separator)
     }
 
-    #[allow(dead_code)]
     pub(crate) fn get_requirements(&self) -> Option<Vec<String>> {
         self.requirements.as_ref().and_then(|requirements| {
             let reqs: Vec<String> = requirements
@@ -138,9 +132,9 @@ where
     D: Deserializer<'de>,
 {
     let authors: Vec<String> = String::deserialize(deserializer)?
-        .split(|c| c == ',' || c == '&')
+        .split([',', '&'])
         .filter(|s| !s.trim().is_empty())
-        .map(|s| s.to_string())
+        .map(std::string::ToString::to_string)
         .collect();
 
     Ok(authors)
@@ -164,7 +158,7 @@ where
         1 => Ok(ApprovalStatus::Approved),
         2 => Ok(ApprovalStatus::Broken(helper.reason)),
         3 => Ok(ApprovalStatus::Outdated(helper.reason)),
-        
+
         status => Err(de::Error::custom(format!(
             "Invalid approvalStatus value: {status}"
         ))),
@@ -198,7 +192,7 @@ fn normalize_version(version: &str) -> String {
 
     // If there was a pre-release part, append it back
     if let Some(pre_release) = parts.next() {
-        format!("{}-{}", normalized_version, pre_release)
+        format!("{normalized_version}-{pre_release}")
     } else {
         normalized_version
     }

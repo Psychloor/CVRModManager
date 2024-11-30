@@ -10,15 +10,15 @@ pub(crate) mod api_error;
 pub(crate) mod mod_info;
 pub(crate) mod mod_version;
 
-const API_DOMAIN_URL: &'static str = "https://api.cvrmg.com";
-const API_VERSION: &'static str = "v1";
-const USER_AGENT: &'static str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
+const API_DOMAIN_URL: &str = "https://api.cvrmg.com";
+const API_VERSION: &str = "v1";
+const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
 #[cfg(debug_assertions)]
-const MODS_JSON: &'static str = include_str!("mods.json");
+const MODS_JSON: &str = include_str!("mods.json");
 
 fn get_mods_api_url() -> String {
-    format!("{}/{}/mods/", API_DOMAIN_URL, API_VERSION)
+    format!("{API_DOMAIN_URL}/{API_VERSION}/mods/")
 }
 
 fn create_client() -> reqwest::Result<Client> {
@@ -54,8 +54,12 @@ fn get_file_name_from_url(response: &reqwest::Response) -> Option<String> {
         .split('/')
         .filter(|s| !s.is_empty()) // Ignore empty segments
         .last()
-        .filter(|&s| s.ends_with(".dll"))
-        .map(|s| s.to_string())
+        .filter(|&s| {
+            std::path::Path::new(s)
+                .extension()
+                .map_or(false, |ext| ext.eq_ignore_ascii_case("dll"))
+        })
+        .map(std::string::ToString::to_string)
 }
 
 pub(crate) async fn download_and_verify_mod_with_info<P: Into<PathBuf>>(
@@ -89,16 +93,10 @@ pub(crate) async fn download_and_verify_mod<P: Into<PathBuf>>(
     if let Some(file_name) = get_file_name_from_url(&response) {
         let bytes = response.bytes().await?;
 
-        sha256_hasher::compute_sha256_hash(&bytes)
-            .await
-            .ok_or_else(|| ApiError::InvalidFileHash)
-            .and_then(|file_hash| {
-                if file_hash.eq(mod_hash) {
-                    Ok(())
-                } else {
-                    Err(ApiError::InvalidFileHash)
-                }
-            })?;
+        let hash = sha256_hasher::compute_sha256_hash(&bytes);
+        if hash != mod_hash {
+            return Err(ApiError::InvalidFileHash);
+        }
 
         let file_path = match mod_type {
             ModType::Mod => loader_path.into().join("Mods"),
