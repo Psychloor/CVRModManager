@@ -54,7 +54,7 @@ pub fn is_melon_loader_installed() -> bool {
     version_dll && bootstrap_dll
 }
 
-pub fn remove_melon_loader() -> Result<(), &'static str> {
+pub fn remove_melon_loader() -> Result<(), String> {
     let chillout_folder_path = Path::new(config::CONFIGURATION_INSTANCE.chillout_folder());
 
     let version_dll = chillout_folder_path.join("version.dll");
@@ -62,15 +62,17 @@ pub fn remove_melon_loader() -> Result<(), &'static str> {
     let melon_loader = chillout_folder_path.join("MelonLoader");
 
     if version_dll.try_exists().unwrap_or(false) {
-        std::fs::remove_file(version_dll).map_err(|_| "Failed to remove version.dll")?;
+        std::fs::remove_file(&version_dll)
+            .map_err(|e| format!("Failed to remove version.dll: {e}"))?;
     }
 
     if dobby_dll.try_exists().unwrap_or(false) {
-        std::fs::remove_file(dobby_dll).map_err(|_| "Failed to remove dobby.dll")?;
+        std::fs::remove_file(&dobby_dll).map_err(|e| format!("Failed to remove dobby.dll: {e}"))?;
     }
 
     if melon_loader.try_exists().unwrap_or(false) {
-        std::fs::remove_dir_all(melon_loader).map_err(|_| "Failed to remove MelonLoader folder")?;
+        std::fs::remove_dir_all(&melon_loader)
+            .map_err(|e| format!("Failed to remove MelonLoader folder: {e}"))?;
     }
 
     Ok(())
