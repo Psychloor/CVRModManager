@@ -29,4 +29,13 @@ pub(crate) enum ApiError {
 
     #[error("Mod version not found")]
     ModVersionNotFound,
+
+    #[error("Invalid color length")]
+    InvalidColoreLength,
+
+    #[error("Invalid color value")]
+    ParseIntError(#[from] std::num::ParseIntError),
+
+    #[error("Invalid color hex length")]
+    InvalidColorHexLength,
 }

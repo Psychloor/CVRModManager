@@ -3,6 +3,8 @@ use serde::de::{self};
 use serde::{Deserialize, Deserializer};
 use std::str::FromStr;
 
+use super::ApiError;
+
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone, Default)]
 pub(crate) enum ApprovalStatus {
     #[default]
@@ -50,24 +52,45 @@ pub(crate) struct ModVersion {
 }
 
 impl ModVersion {
-    pub(crate) fn color_as_f32(&self) -> Result<[f32; 3], std::num::ParseIntError> {
+    pub(crate) fn color_as_f32(&self) -> Result<[f32; 3], ApiError> {
+        let max = f32::from(u8::MAX);
         let hex = self.embed_color.trim_start_matches('#');
-        Ok([
-            f32::from(u8::from_str_radix(&hex[0..2], 16)?) / 255.0,
-            f32::from(u8::from_str_radix(&hex[2..4], 16)?) / 255.0,
-            f32::from(u8::from_str_radix(&hex[4..6], 16)?) / 255.0,
-        ])
+        if hex.len() == 6 {
+            Ok([
+                f32::from(u8::from_str_radix(&hex[0..2], 16)?) / max,
+                f32::from(u8::from_str_radix(&hex[2..4], 16)?) / max,
+                f32::from(u8::from_str_radix(&hex[4..6], 16)?) / max,
+            ])
+        } else if hex.len() == 3 {
+            Ok([
+                f32::from(u8::from_str_radix(&format!("{0}{0}", &hex[0..1]), 16)?) / max,
+                f32::from(u8::from_str_radix(&format!("{0}{0}", &hex[1..2]), 16)?) / max,
+                f32::from(u8::from_str_radix(&format!("{0}{0}", &hex[2..3]), 16)?) / max,
+            ])
+        } else {
+            Err(ApiError::InvalidColorHexLength)
+        }
     }
 
     // Converts color hex to [u8; 3]
 
-    pub(crate) fn color_as_u8(&self) -> Result<[u8; 3], std::num::ParseIntError> {
+    pub(crate) fn color_as_u8(&self) -> Result<[u8; 3], ApiError> {
         let hex = self.embed_color.trim_start_matches('#');
-        Ok([
-            u8::from_str_radix(&hex[0..2], 16)?,
-            u8::from_str_radix(&hex[2..4], 16)?,
-            u8::from_str_radix(&hex[4..6], 16)?,
-        ])
+        if hex.len() == 6 {
+            Ok([
+                u8::from_str_radix(&hex[0..2], 16)?,
+                u8::from_str_radix(&hex[2..4], 16)?,
+                u8::from_str_radix(&hex[4..6], 16)?,
+            ])
+        } else if hex.len() == 3 {
+            Ok([
+                u8::from_str_radix(&format!("{0}{0}", &hex[0..1]), 16)?,
+                u8::from_str_radix(&format!("{0}{0}", &hex[1..2]), 16)?,
+                u8::from_str_radix(&format!("{0}{0}", &hex[2..3]), 16)?,
+            ])
+        } else {
+            Err(ApiError::InvalidColorHexLength)
+        }
     }
 
     pub(crate) fn get_authors_joined(&self, separator: &str) -> String {
