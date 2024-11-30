@@ -3,6 +3,7 @@ name = "CVRModManager"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
+license-file = "LICENSE"
 
 [dependencies]
 serde = { version = "1.0.210", features = ["derive", "serde_derive"] }
@@ -19,7 +20,7 @@ regex = { version = "1.11.1" }
 [profile.dev]
 opt-level = 1
 incremental = true
-debug = 2 # 0: no debug info, 1: line tables only, 2: full debug info
+debug = 2          # 0: no debug info, 1: line tables only, 2: full debug info
 
 [profile.release]
 overflow-checks = false
@@ -27,5 +28,5 @@ codegen-units = 1
 opt-level = 3
 lto = "fat"
 debug-assertions = false
-debug = 1 # Useful for post-mortem debugging
+debug = 1                # Useful for post-mortem debugging
 incremental = true
