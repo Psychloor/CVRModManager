@@ -43,11 +43,11 @@ impl CVRMelonConfig {
         &self.chillout_folder
     }
 
-    pub fn set_chillout_folder(&mut self, folder_path: String) -> Result<(), &'static str> {
-        let path = Path::new(&folder_path);
+    pub fn set_chillout_folder(&mut self, folder_path: &str) -> Result<(), &'static str> {
+        let path = Path::new(folder_path);
         if path.exists() {
             if path.is_dir() {
-                self.chillout_folder = folder_path;
+                self.chillout_folder = folder_path.to_string();
                 self.save();
                 Ok(())
             } else {
