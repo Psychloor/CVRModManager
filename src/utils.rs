@@ -23,7 +23,10 @@ pub(crate) async fn get_all_files_in_directory(
 
     while let Some(entry) = entries.next_entry().await? {
         if entry.file_type().await?.is_file() {
-            let file_name = entry.file_name().to_string_lossy().to_string();
+            let file_name = match entry.file_name().to_str() {
+                Some(name) => name.to_string(),
+                None => continue,
+            };
 
             if filter.is_empty() || file_name.contains(filter) {
                 files.push(file_name);
