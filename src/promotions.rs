@@ -27,7 +27,7 @@ impl Promotions {
         let mut promotions = Vec::new();
 
         promotions.push(Promotion::new(
-            "Chillout Modding Group".to_string(),
+            "ChilloutVR Modding Group".to_string(),
             "Join our Discord!".to_string(),
             "https://discord.gg/dndGPM3bxu".to_string(),
         ));
