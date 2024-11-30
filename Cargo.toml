@@ -1,0 +1,30 @@
+[package]
+name = "CVRModManager"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0.210", features = ["derive", "serde_derive"] }
+serde_json = "1.0.128"
+reqwest = { version = "0.12.8", features = ["json"] }
+tokio = { version = "1.40.0", features = ["full"] }
+tokio-util = "0.7.12"
+sha2 = "0.10.8"
+base64 = "0.22.1"
+semver = "1.0"
+thiserror = "1.0.64"
+regex = { version = "1.11.1" }
+
+[profile.dev]
+opt-level = 1
+incremental = true
+debug = 2 # 0: no debug info, 1: line tables only, 2: full debug info
+
+[profile.release]
+overflow-checks = false
+codegen-units = 1
+opt-level = 3
+lto = "fat"
+debug-assertions = false
+debug = 1 # Useful for post-mortem debugging
+incremental = true
