@@ -52,6 +52,7 @@ pub(crate) struct ModVersion {
 }
 
 impl ModVersion {
+    // Converts color hex to [f32; 3]
     pub(crate) fn color_as_f32(&self) -> Result<[f32; 3], ApiError> {
         let max = f32::from(u8::MAX);
         let hex = self.embed_color.trim_start_matches('#');
@@ -73,7 +74,6 @@ impl ModVersion {
     }
 
     // Converts color hex to [u8; 3]
-
     pub(crate) fn color_as_u8(&self) -> Result<[u8; 3], ApiError> {
         let hex = self.embed_color.trim_start_matches('#');
         if hex.len() == 6 {
