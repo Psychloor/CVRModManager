@@ -37,14 +37,14 @@ pub(crate) async fn get_all_files_in_directory(
 }
 
 pub fn is_melon_loader_installed() -> bool {
-    let melon_loader_path = Path::new(config::CONFIGURATION_INSTANCE.chillout_folder());
+    let chillout_folder_path = Path::new(config::CONFIGURATION_INSTANCE.chillout_folder());
 
-    let version_dll = melon_loader_path
+    let version_dll = chillout_folder_path
         .join("version.dll")
         .try_exists()
         .unwrap_or(false);
 
-    let bootstrap_dll = melon_loader_path
+    let bootstrap_dll = chillout_folder_path
         .join("MelonLoader")
         .join("Dependencies")
         .join("Bootstrap.dll")
@@ -55,11 +55,11 @@ pub fn is_melon_loader_installed() -> bool {
 }
 
 pub fn remove_melon_loader() -> Result<(), &'static str> {
-    let melon_loader_path = Path::new(config::CONFIGURATION_INSTANCE.chillout_folder());
+    let chillout_folder_path = Path::new(config::CONFIGURATION_INSTANCE.chillout_folder());
 
-    let version_dll = melon_loader_path.join("version.dll");
-    let dobby_dll = melon_loader_path.join("dobby.dll");
-    let melon_loader = melon_loader_path.join("MelonLoader");
+    let version_dll = chillout_folder_path.join("version.dll");
+    let dobby_dll = chillout_folder_path.join("dobby.dll");
+    let melon_loader = chillout_folder_path.join("MelonLoader");
 
     if version_dll.try_exists().unwrap_or(false) {
         std::fs::remove_file(version_dll).map_err(|_| "Failed to remove version.dll")?;
