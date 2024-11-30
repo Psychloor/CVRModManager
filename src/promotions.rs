@@ -16,7 +16,7 @@ impl Promotion {
     }
 }
 
-static PROMOTIONS: LazyLock<Promotions> = LazyLock::new(Promotions::new);
+pub static PROMOTIONS: LazyLock<Promotions> = LazyLock::new(Promotions::new);
 
 pub struct Promotions {
     pub promotions: Vec<Promotion>,

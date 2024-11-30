@@ -2,7 +2,6 @@ use crate::api::api_error::ApiError;
 use crate::api::mod_info::ModInfo;
 use crate::api::mod_version::ModType;
 use crate::sha256_hasher;
-use reqwest::header::HeaderMap;
 use reqwest::Client;
 use std::path::PathBuf;
 use tokio::io::AsyncWriteExt;
@@ -25,14 +24,14 @@ fn get_mods_api_url() -> String {
 fn create_client() -> reqwest::Result<Client> {
     Client::builder()
         .user_agent(USER_AGENT)
-        .default_headers({
+        /*.default_headers({
             let mut headers = HeaderMap::new();
             headers.insert(
                 "User-Agent",
                 USER_AGENT.parse().expect("User-Agent not valid header"),
             );
             headers
-        })
+        })*/
         .build()
 }
 
