@@ -1,3 +1,5 @@
+use std::sync::LazyLock;
+
 pub struct Promotion {
     pub mod_name: String,
     pub description: String,
@@ -14,12 +16,14 @@ impl Promotion {
     }
 }
 
+static PROMOTIONS: LazyLock<Promotions> = LazyLock::new(Promotions::new);
+
 pub struct Promotions {
     pub promotions: Vec<Promotion>,
 }
 
 impl Promotions {
-    pub fn new() -> Self {
+    fn new() -> Self {
         let mut promotions = Vec::new();
 
         promotions.push(Promotion::new(
