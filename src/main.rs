@@ -1,13 +1,18 @@
-#![allow(clippy::all)]
+#![warn(clippy::pedantic)]
+#![warn(clippy::perf)]
+#![warn(clippy::style)]
+#![warn(clippy::correctness)]
+#![warn(clippy::complexity)]
+#![warn(clippy::suspicious)]
 #![allow(dead_code)]
 
 pub(crate) mod api;
+pub mod authors;
 pub mod categories;
+pub mod config;
+pub mod promotions;
 pub(crate) mod sha256_hasher;
 pub mod utils;
-pub mod promotions;
-pub mod config;
-pub mod authors;
 
 #[tokio::main]
 async fn main() {
